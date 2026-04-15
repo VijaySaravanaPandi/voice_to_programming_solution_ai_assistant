@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VoiceAgent AI — Local Voice-Controlled AI Assistant</title>
+  <meta name="description" content="Voice-controlled local AI agent that transcribes speech, classifies intent, and executes local tools." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Animated background -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- ── Header ── -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+        </div>
+        <span class="logo-text">VoiceAgent <span class="logo-ai">AI</span></span>
+      </div>
+      <div class="header-right">
+        <!-- Memory badge: shows how many context turns are loaded -->
+        <span class="memory-badge hidden" id="memoryBadge" title="Session chat memory active">🧠 0 context</span>
+        <div class="status-pill" id="statusPill">
+          <span class="status-dot"></span>
+          <span id="statusText">Ready</span>
+        </div>
+        <button class="btn-icon" id="historyToggle" title="Toggle History" aria-label="Toggle History">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 3h18M3 9h18M3 15h18M3 21h18"/>
+          </svg>
+        </button>
+        <button class="btn-icon" id="filesToggle" title="Output Files" aria-label="Output Files">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Main Layout ── -->
+  <main class="main-layout">
+
+    <!-- ── Left Panel: Input ── -->
+    <section class="panel panel-input" aria-label="Audio Input">
+      <div class="panel-header">
+        <h2 class="panel-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+          Audio Input
+        </h2>
+      </div>
+
+      <!-- Mic + Upload tabs -->
+      <div class="tab-group" role="tablist">
+        <button class="tab active" id="tabMic" role="tab" aria-selected="true" aria-controls="paneMic">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+          Microphone
+        </button>
+        <button class="tab" id="tabFile" role="tab" aria-selected="false" aria-controls="paneFile">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Upload
+        </button>
+      </div>
+
+      <!-- Mic pane -->
+      <div class="tab-pane active" id="paneMic" role="tabpanel">
+        <div class="mic-area" id="micArea">
+          <div class="mic-visualizer" id="micVisualizer" aria-hidden="true">
+            <div class="mic-ring ring-1"></div>
+            <div class="mic-ring ring-2"></div>
+            <div class="mic-ring ring-3"></div>
+            <button class="mic-btn" id="micBtn" aria-label="Start recording">
+              <svg class="mic-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="23"/>
+                <line x1="8" y1="23" x2="16" y2="23"/>
+              </svg>
+              <svg class="stop-icon hidden" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="3" y="3" width="18" height="18" rx="3"/>
+              </svg>
+            </button>
+          </div>
+          <p class="mic-hint" id="micHint">Click the microphone to start recording</p>
+          <div class="recording-timer hidden" id="recordingTimer">
+            <span class="rec-dot"></span>
+            <span id="timerDisplay">0:00</span>
+          </div>
+          <!-- Audio playback -->
+          <div class="audio-preview hidden" id="audioPreview">
+            <audio id="audioPlayer" controls></audio>
+            <div class="audio-actions">
+              <button class="btn btn-primary btn-sm" id="submitMicBtn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                Process Recording
+              </button>
+              <button class="btn btn-ghost btn-sm" id="retryMicBtn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.1"/></svg>
+                Retry
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- File pane -->
+      <div class="tab-pane" id="paneFile" role="tabpanel">
+        <div class="upload-area" id="uploadArea">
+          <input type="file" id="audioFileInput" accept=".wav,.mp3,.m4a,.ogg,.flac,.webm" class="file-input-hidden" />
+          <div class="upload-dropzone" id="dropzone" tabindex="0" role="button" aria-label="Drop audio file or click to browse">
+            <div class="upload-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+            </div>
+            <p class="upload-text">Drop your audio file here</p>
+            <p class="upload-sub">or <span class="upload-link">browse files</span></p>
+            <p class="upload-formats">WAV · MP3 · M4A · OGG · FLAC</p>
+          </div>
+          <div class="file-selected hidden" id="fileSelected">
+            <div class="file-info">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+              <div>
+                <p class="file-name" id="selectedFileName">audio.wav</p>
+                <p class="file-size" id="selectedFileSize">0 KB</p>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm" id="submitFileBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              Process Audio
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Center Panel: Pipeline ── -->
+    <section class="panel panel-pipeline" aria-label="AI Pipeline">
+      <div class="panel-header">
+        <h2 class="panel-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+          AI Pipeline
+        </h2>
+        <div class="pipeline-meta" id="pipelineMeta"></div>
+      </div>
+
+      <!-- Pipeline steps -->
+      <div class="pipeline-flow" id="pipelineFlow">
+        <div class="pipeline-step" id="step-stt" data-step="stt">
+          <div class="step-header">
+            <div class="step-number">1</div>
+            <div class="step-info">
+              <h3 class="step-title">Speech-to-Text</h3>
+              <p class="step-sub">Whisper via Groq API</p>
+            </div>
+            <div class="step-badge" id="badge-stt"></div>
+          </div>
+          <div class="step-body" id="body-stt">
+            <div class="step-placeholder">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+              <span>Waiting for audio input...</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-connector" aria-hidden="true">
+          <div class="connector-line"></div>
+          <div class="connector-arrow">▼</div>
+        </div>
+
+        <div class="pipeline-step" id="step-intent" data-step="intent">
+          <div class="step-header">
+            <div class="step-number">2</div>
+            <div class="step-info">
+              <h3 class="step-title">Intent Classification</h3>
+              <p class="step-sub">Ollama / Groq LLM</p>
+            </div>
+            <div class="step-badge" id="badge-intent"></div>
+          </div>
+          <div class="step-body" id="body-intent">
+            <div class="step-placeholder">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+              <span>Intent will appear here...</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-connector" aria-hidden="true">
+          <div class="connector-line"></div>
+          <div class="connector-arrow">▼</div>
+        </div>
+
+        <div class="pipeline-step" id="step-tool" data-step="tool">
+          <div class="step-header">
+            <div class="step-number">3</div>
+            <div class="step-info">
+              <h3 class="step-title">Tool Execution</h3>
+              <p class="step-sub">Local action runner</p>
+            </div>
+            <div class="step-badge" id="badge-tool"></div>
+          </div>
+          <div class="step-body" id="body-tool">
+            <div class="step-placeholder">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+              <span>Tool action will appear here...</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-connector" aria-hidden="true">
+          <div class="connector-line"></div>
+          <div class="connector-arrow">▼</div>
+        </div>
+
+        <div class="pipeline-step step-result" id="step-result" data-step="result">
+          <div class="step-header">
+            <div class="step-number">4</div>
+            <div class="step-info">
+              <h3 class="step-title">Final Output</h3>
+              <p class="step-sub">Agent response</p>
+            </div>
+            <div class="step-badge" id="badge-result"></div>
+          </div>
+          <div class="step-body" id="body-result">
+            <div class="step-placeholder">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              <span>Output will appear here...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Model Benchmarking Panel ── -->
+      <div class="benchmark-panel hidden" id="benchmarkPanel" aria-label="Model Benchmarks"></div>
+
+      <!-- Confirm dialog for file operations (Human-in-the-Loop) -->
+      <div class="confirm-dialog hidden" id="confirmDialog" role="dialog" aria-modal="true" aria-label="Confirm Action">
+        <div class="confirm-content">
+          <div class="confirm-icon">⚠️</div>
+          <h3 class="confirm-title">Confirm Action</h3>
+          <p class="confirm-message" id="confirmMessage">This will create/modify files. Proceed?</p>
+          <div class="confirm-actions">
+            <button class="btn btn-ghost" id="confirmCancel">Cancel</button>
+            <button class="btn btn-danger" id="confirmOk">Proceed</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── History Sidebar ── -->
+  <aside class="sidebar" id="historySidebar" aria-label="Session History">
+    <div class="sidebar-header">
+      <h2 class="sidebar-title">Session History</h2>
+      <button class="btn-icon" id="clearHistory" title="Clear history" aria-label="Clear history">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </button>
+    </div>
+    <div class="sidebar-items" id="historyItems">
+      <div class="empty-state">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <p>No history yet</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Files Sidebar ── -->
+  <aside class="sidebar sidebar-right" id="filesSidebar" aria-label="Output Files">
+    <div class="sidebar-header">
+      <h2 class="sidebar-title">Output Files</h2>
+      <button class="btn-icon" id="refreshFiles" title="Refresh" aria-label="Refresh files">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.1"/></svg>
+      </button>
+    </div>
+    <div class="sidebar-items" id="filesItems">
+      <div class="empty-state">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <p>No files yet</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── File Viewer Modal ── -->
+  <div class="modal-overlay hidden" id="fileModal">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">File Content</h3>
+        <button class="btn-icon" id="modalClose" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <pre class="modal-code" id="modalCode"></pre>
+    </div>
+  </div>
+
+  <!-- Toast notifications -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

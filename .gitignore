@@ -1,0 +1,17 @@
+output/*
+!output/.gitkeep
+__pycache__/
+*.pyc
+*.pyo
+.env
+*.egg-info/
+dist/
+build/
+.DS_Store
+Thumbs.db
+*.log
+/tmp/
+node_modules/
+venv/
+.venv/
+.gemini/
