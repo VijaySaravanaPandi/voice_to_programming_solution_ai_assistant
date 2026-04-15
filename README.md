@@ -4,6 +4,14 @@ A full-stack voice-controlled AI agent that transcribes speech, classifies inten
 
 ![Pipeline: Audio → STT → Intent → Tool → Output](https://img.shields.io/badge/Pipeline-Audio→STT→Intent→Tool→Output-6366f1?style=for-the-badge)
 
+![Status: Ready to Run](https://img.shields.io/badge/Status-Ready_to_Run-success?style=flat-square)
+![Tests: Passing](https://img.shields.io/badge/Version-1.0.0-blue?style=flat-square)
+
+---
+
+### ✅ Deployment Status
+Both the **FastAPI Backend** and **Vanilla JS Frontend** are fully integrated and verified. The backend serves the frontend assets directly, ensuring smooth communication and zero CORS issues when running on the default `localhost:8000`.
+
 ---
 
 ## 🏗️ Architecture
@@ -83,22 +91,23 @@ Get a **free** Groq API key at [console.groq.com](https://console.groq.com)
 ### 4. (Optional) Start Ollama for local LLM
 ```bash
 # Install Ollama: https://ollama.ai
-ollama pull llama3
+ollama pull gemma3:4b
 ```
 > If Ollama is not running, the system automatically falls back to Groq LLM.
 
-### 5. Check your setup
+### 5. Start the backend
+Go into the backend folder and start the server:
 ```bash
-python check_setup.py
+cd backend
+python main.py
 ```
 
-### 6. Start the backend
+### 6. Open the UI (Automatic)
+In a **new terminal**, run the dev script from the project root. This will print the dashboard and automatically open your browser:
 ```bash
-python backend/main.py
+python dev.py
 ```
-
-### 7. Open the UI
-Navigate to **http://localhost:8000** in your browser.
+*Note: You can also manually visit **http://localhost:8000**.*
 
 ---
 
